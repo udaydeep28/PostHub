@@ -1,28 +1,39 @@
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { formatISO9075 } from "date-fns";
 import { UserContext } from "../utils/UserContext";
-import { Link } from "react-router-dom";
 
 export default function PostPage() {
   const [postInfo, setPostInfo] = useState(null);
   const { userInfo } = useContext(UserContext);
   const { id } = useParams();
-  useEffect(() => {
-    fetch(`http://localhost:4000/post/${id}`).then((response) => {
-      response.json().then((postInfo) => {
-        setPostInfo(postInfo);
-      });
-    });
-  }, []);
 
-  if (!postInfo) return "";
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/post/${id}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setPostInfo(data);
+      } catch (error) {
+        console.error("Error fetching post:", error);
+        // Optionally set postInfo to a default state or show an error message
+      }
+    };
+
+    fetchPost();
+  }, [id]);
+
+  if (!postInfo) return <div>Loading...</div>; // Show loading state
 
   return (
     <div className="post-page">
       <h1>{postInfo.title}</h1>
       <time>{formatISO9075(new Date(postInfo.createdAt))}</time>
       <div className="author">by @{postInfo.author.username}</div>
+
       {userInfo.id === postInfo.author._id && (
         <div className="edit-row">
           <Link className="edit-btn" to={`/edit/${postInfo._id}`}>
@@ -44,8 +55,13 @@ export default function PostPage() {
           </Link>
         </div>
       )}
+
       <div className="image">
-        <img src={`http://localhost:4000/${postInfo.cover}`} alt="" />
+        <img
+          src={`http://localhost:4000/${postInfo.cover}`}
+          alt={postInfo.title}
+        />{" "}
+        {/* Use title for alt text */}
       </div>
       <div
         className="content"
