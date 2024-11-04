@@ -11,7 +11,7 @@ export default function PostPage() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/post/${id}`);
+        const response = await fetch(`https://posthub-backend.onrender.com/post/${id}`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -58,7 +58,7 @@ export default function PostPage() {
 
       <div className="image">
         <img
-          src={`http://localhost:4000/${postInfo.cover}`}
+          src={`https://posthub-backend.onrender.com/${postInfo.cover}`}
           alt={postInfo.title}
         />{" "}
         {/* Use title for alt text */}
